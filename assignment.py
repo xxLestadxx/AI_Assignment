@@ -3,6 +3,7 @@ import numpy as np
 import random
 import os
 from math import sqrt
+from random import shuffle
 
 # Reads the file  of colours
 # Returns the number of colours in the file and a list with the colours (RGB) values
@@ -46,21 +47,22 @@ os.chdir(dir_path) # Change the working directory so we can read the file
 
 ncolors, colours = read_file('colours.txt')  # Total number of colours and list of colours
 
-test_size = 500  # Size of the subset of colours for testing
+test_size = 100  # Size of the subset of colours for testing
 test_colours = colours[0:test_size]  # list of colours for testing
 
-permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
-plot_colours(test_colours, permutation)
+#permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
+#plot_colours(test_colours, permutation)
 
-def constructive(numColours,randomCol):
+def constructive(numberOfColours,randomColour):
     constructive_order = []
     res = []
-    colours_copy = colours[0:numColours]
-    n = randomCol
-    # where n is the random color
+    sumOfSolutions = 0
+    colours_copy = colours[0:numberOfColours]
+    n = randomColour
+    # where n is the first random color and then is the next color
     constructive_order.append(colours.index(colours_copy[n]))
     del colours_copy[n]
-    while(len(constructive_order)<numColours):
+    while(len(constructive_order)<numberOfColours):
 #        print "n e ", n
         for p in range(len(colours_copy)):
             result = sqrt((float(colours[n][0]) - float(colours_copy[p][0]))**2 + (float(colours[n][1]) - float(colours_copy[p][1]))**2 + (float(colours[n][2]) - float(colours_copy[p][2]))**2)
@@ -68,10 +70,11 @@ def constructive(numColours,randomCol):
             best = min(res)
             i = res.index(best)
 
-        print "best is ", best
-        print "res ot ",i, " e to ", res[i]
-        print "colors copy ot i e ", colours_copy[i]
-        print "color e ", colours.index(colours_copy[i])
+#        print "best is ", best
+#        print "res ot ",i, " e to ", res[i]
+#        print "colors copy ot i e ", colours_copy[i]
+#        print "color e ", colours.index(colours_copy[i])
+        sumOfSolutions += best
         n = colours.index(colours_copy[i])
 #        print "n e ", n
 #        print "colors original ot i e " ,colours[i]
@@ -79,9 +82,26 @@ def constructive(numColours,randomCol):
         constructive_order.append(colours.index(colours_copy[i]))
         del colours_copy[i]
 
-    return constructive_order
+    return constructive_order, sumOfSolutions
 
 n = random.randint(0,test_size)
-ko = constructive(test_size,n)
+greedyColoursList, sumOfGreedySol = constructive(test_size,n)
+
 #print "the list of the indexes is: " ,ko
-plot_colours(test_colours, ko)
+print "the sum of the distances is", sumOfGreedySol
+#plot_colours(test_colours, greedyColoursList)
+
+#shuffling the list of colours so that I can different solutions
+shuffledColours = random.sample(test_colours, len(test_colours))
+#print "The shuffled is ", shuffledColours
+
+def evaluate(sol):
+    total = 0
+    for i in range(len(sol)-1):
+        result = sqrt((float(sol[i][0]) - float(sol[i+1][0]))**2 + (float(sol[i][1]) - float(sol[i+1][1]))**2 + (float(sol[i][2]) - float(sol[i+1][2]))**2)
+        total += result
+
+    return total
+
+randomSol = evaluate(shuffledColours)
+#print "random e tukaaa ", randomSol
