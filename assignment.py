@@ -48,32 +48,36 @@ os.chdir(dir_path) # Change the working directory so we can read the file
 
 ncolors, colours = read_file('colours.txt')  # Total number of colours and list of colours
 
-test_size = 100  # Size of the subset of colours for testing
+test_size = 10 # Size of the subset of colours for testing
 test_colours = colours[0:test_size]  # list of colours for testing
 
-#permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
+permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
 #plot_colours(test_colours, permutation)
 
-def constructive(numberOfColours,randomColour):
+def constructive(setOfColours,randomColour):
     constructive_order = []
     res = []
     sumOfSolutions = 0
-    colours_copy = colours[0:numberOfColours]
+    colours_copy = setOfColours[0:len(setOfColours)]
     n = randomColour
     # where n is the first random color and then is the next color
     constructive_order.append(colours.index(colours_copy[n]))
+    print " colors ", colours.index(colours_copy[n]), " actual colour", colours_copy[n]
+    print " setOfColours", setOfColours.index(colours_copy[n]), "actual colour", colours_copy[n]
     del colours_copy[n]
-    while(len(constructive_order)<numberOfColours):
+
+    while(len(constructive_order)<len(setOfColours)):
 #        print "n e ", n
         for p in range(len(colours_copy)):
+            print "len ", colours_copy[p]
             result = sqrt((float(colours[n][0]) - float(colours_copy[p][0]))**2 + (float(colours[n][1]) - float(colours_copy[p][1]))**2 + (float(colours[n][2]) - float(colours_copy[p][2]))**2)
             res.append(result)
             best = min(res)
             i = res.index(best)
 
-#        print "best is ", best
-#        print "res ot ",i, " e to ", res[i]
-#        print "colors copy ot i e ", colours_copy[i]
+        print "best is ", best
+    #    print "res ot ",i, " e to ", res[i]
+    #    print "colors copy ot i e ", colours_copy[i]
 #        print "color e ", colours.index(colours_copy[i])
         sumOfSolutions += best
         n = colours.index(colours_copy[i])
@@ -85,28 +89,33 @@ def constructive(numberOfColours,randomColour):
 
     return constructive_order, sumOfSolutions
 
-n = random.randint(0,test_size)
-greedyColoursList, sumOfGreedySol = constructive(test_size,n)
+firstRandomColor = random.randint(0,test_size)
+greedyColoursList, sumOfGreedySol = constructive(test_colours,firstRandomColor)
 
-#print "the list of the indexes is: " ,ko
-print "the sum of the distances is", sumOfGreedySol
-plot_colours(test_colours, greedyColoursList)
+def listOfIndexesIntoColours(listOfIndexes):
+    list = []
+    for i in listOfIndexes:
+        print "i is: ", i
+        list.append(colours[i])
+    return list
+
+permutationColours = listOfIndexesIntoColours(greedyColoursList)
+print "greedy is: ", greedyColoursList
+#print "the sum of the distances in greedy is : ", sumOfGreedySol
+#plot_colours(test_colours, greedyColoursList)
+greedyColoursList, sumOfGreedySol = constructive(permutationColours,firstRandomColor)
+#print "the sum of the distances in greedy permutation is: ", sumOfGreedySol
+#plot_colours(test_colours,greedyColoursList)
 
 
 #This function swaps two of the indexes does not return anything, as the change is done to the list itself
+
 def swap_random(seq):
          idx = range(len(seq))
         # print "lengtha e tolkoz", len(seq)
          i1, i2 = random.sample(idx, 2)
          seq[i1], seq[i2] = seq[i2], seq[i1]
 
-#shuffling the list of colours so that I can different solutions
-shuffledColours = random.sample(test_colours, len(test_colours))
-
-#print "The test_colours are", test_colours
-#print "The shuffled is ", shuffledColours
-swap_random(shuffledColours)
-#print "the inverted colors are", shuffledColours
 
 def evaluate(sol):
     total = 0
@@ -116,12 +125,10 @@ def evaluate(sol):
 
     return total
 
-randomSolSum = evaluate(shuffledColours)
-#print "random e tukaaa ", randomSolSum
 
 def hill_climbing(setOfColours, numberOfIterations):
-
-    sol = setOfColours[0:len(setOfColours)]  # list of colours for testing
+    #shuffling the list of colours so that i can have a random start
+    sol= random.sample(setOfColours, len(setOfColours)) # list of colours for testing
     bestSolList = [[]]
     solListIndencies = []
     eval_sol = evaluate(sol)
@@ -143,6 +150,6 @@ def hill_climbing(setOfColours, numberOfIterations):
 
     return solListIndencies, eval_sol
 
-ko, be = hill_climbing(shuffledColours, 2000)
-print " i tva evaluate", be
-plot_colours(test_colours, ko)
+ko, be = hill_climbing(test_colours, 2000)
+#print " the sum in hill_climbing is : ", be
+#plot_colours(test_colours, ko)
