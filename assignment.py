@@ -4,6 +4,7 @@ import random
 import os
 from math import sqrt
 from random import shuffle
+from copy import deepcopy
 
 # Reads the file  of colours
 # Returns the number of colours in the file and a list with the colours (RGB) values
@@ -89,11 +90,23 @@ greedyColoursList, sumOfGreedySol = constructive(test_size,n)
 
 #print "the list of the indexes is: " ,ko
 print "the sum of the distances is", sumOfGreedySol
-#plot_colours(test_colours, greedyColoursList)
+plot_colours(test_colours, greedyColoursList)
+
+
+#This function swaps two of the indexes does not return anything, as the change is done to the list itself
+def swap_random(seq):
+         idx = range(len(seq))
+        # print "lengtha e tolkoz", len(seq)
+         i1, i2 = random.sample(idx, 2)
+         seq[i1], seq[i2] = seq[i2], seq[i1]
 
 #shuffling the list of colours so that I can different solutions
 shuffledColours = random.sample(test_colours, len(test_colours))
+
+#print "The test_colours are", test_colours
 #print "The shuffled is ", shuffledColours
+swap_random(shuffledColours)
+#print "the inverted colors are", shuffledColours
 
 def evaluate(sol):
     total = 0
@@ -103,5 +116,33 @@ def evaluate(sol):
 
     return total
 
-randomSol = evaluate(shuffledColours)
-#print "random e tukaaa ", randomSol
+randomSolSum = evaluate(shuffledColours)
+#print "random e tukaaa ", randomSolSum
+
+def hill_climbing(setOfColours, numberOfIterations):
+
+    sol = setOfColours[0:len(setOfColours)]  # list of colours for testing
+    bestSolList = [[]]
+    solListIndencies = []
+    eval_sol = evaluate(sol)
+    while (numberOfIterations>0):
+        swap_random(sol)
+        eval_neighbour_sol = evaluate(sol)
+        if (eval_neighbour_sol < eval_sol):
+            #print "eval_neighbour_sol e ", eval_neighbour_sol
+            bestSolList = deepcopy(sol)
+            eval_sol = eval_neighbour_sol
+
+        numberOfIterations -=1
+
+    for i in range(len(bestSolList)):
+        solListIndencies.append(colours.index(bestSolList[i]))
+
+
+#    print " tui to " ,solListIndencies
+
+    return solListIndencies, eval_sol
+
+ko, be = hill_climbing(shuffledColours, 2000)
+print " i tva evaluate", be
+plot_colours(test_colours, ko)
