@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import os
+import time
+
 from math import sqrt
 from random import shuffle
 from copy import deepcopy
@@ -103,7 +105,7 @@ def evaluate(sol):
 def hill_climbing(setOfColours, numberOfIterations):
     #shuffling the list of colours so that i can have a random start
     sol = random.sample(setOfColours, len(setOfColours)) # list of colours for testing
-    bestSolList = [[]]
+    bestSolList = deepcopy(sol)
     solListIndexes = []
     eval_sol = evaluate(sol)
     while (numberOfIterations>0):
@@ -119,7 +121,7 @@ def hill_climbing(setOfColours, numberOfIterations):
 
     for i in range(len(bestSolList)):
         solListIndexes.append(colours.index(bestSolList[i]))
-#    print " tui to " ,solListIndencies
+    #print " tui to " ,solListIndexes
 
     return solListIndexes, eval_sol
 
@@ -176,14 +178,17 @@ permutation = random.sample(range(test_size), test_size) # produces random pemut
 #plot_colours(test_colours, permutation)
 
 firstRandomColor = random.randint(0,test_size)
+start = time.time()
 greedyColoursList, sumOfGreedySol = constructive(test_colours,firstRandomColor)
+end = time.time()
+print "the greedy time is: ", end-start
 #print "the sum of the distances in greedy is : ", sumOfGreedySol
 #plot_colours(test_colours, greedyColoursList)
 #print "greedy is: ", greedyColoursList
-permutationColours = listOfIndexesIntoColours(greedyColoursList)
+#permutationColours = listOfIndexesIntoColours(greedyColoursList)
 
-b = equal_ignore_order(test_colours, permutationColours)
-print b
+#b = equal_ignore_order(test_colours, permutationColours)
+#print b
 #greedyColoursList, sumOfGreedySol = constructive(permutationColours,firstRandomColor)
 #print "the sum of the distances in greedy permutation is: ", sumOfGreedySol
 #plot_colours(test_colours,greedyColoursList)
@@ -191,14 +196,17 @@ print b
 hillclimbingIterations = 200
 multiHCIterations = 20
 
-hillclimbingIndexes, sumofHillclimbingSol = hill_climbing(test_colours, hillclimbingIterations)
+#hillclimbingIndexes, sumofHillclimbingSol = hill_climbing(test_colours, hillclimbingIterations)
 #print " the sum in hill_climbing is : ", sumofHillclimbingSol
 #plot_colours(test_colours, hillclimbingIndexes)
 
 
 
 #return values, bestSolIndexes, bestSolEval
+start = time.time()
 v, b, s = multi_hc(multiHCIterations)
-print "list of values", v
-print "best value", s
-plot_colours(test_colours, b)
+end = time.time()
+print "the time of the multi_hc is: ", end - start
+#print "list of values", v
+#print "best value", s
+#plot_colours(test_colours, b)
