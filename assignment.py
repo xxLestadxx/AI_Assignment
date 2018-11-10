@@ -174,17 +174,58 @@ ncolors, colours = read_file('colours.txt')  # Total number of colours and list 
 test_size = 100 # Size of the subset of colours for testing
 test_colours = colours[0:test_size]  # list of colours for testing
 
-permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
+test_size500 = 500 # Size of the subset of colours for testing
+test_colours500 = colours[0:test_size500]  # list of colours for testing
+
+#permutation = random.sample(range(test_size), test_size) # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
 #plot_colours(test_colours, permutation)
 
+
+#Greedy algorithm starting with random colour for 100
+print "------ Greedy algorithm for 100 -----"
 firstRandomColor = random.randint(0,test_size)
 start = time.time()
 greedyColoursList, sumOfGreedySol = constructive(test_colours,firstRandomColor)
 end = time.time()
-print "the greedy time is: ", end-start
-#print "the sum of the distances in greedy is : ", sumOfGreedySol
+print "The time of execution for the greedy algotrithm with 100 colours is: ", end-start, ". The sum of the distances is: ", sumOfGreedySol
 #plot_colours(test_colours, greedyColoursList)
-#print "greedy is: ", greedyColoursList
+
+#this is to get the range for the sum of distance of Greedy algorithm solution
+resultCollectorGreedySol100 = []
+
+while(len(resultCollectorGreedySol100)<100):
+    firstRandomColor = random.randint(0,test_size)
+    greedyColoursList, sumOfGreedySol = constructive(test_colours,firstRandomColor)
+    resultCollectorGreedySol100.append(sumOfGreedySol)
+
+minSolution = min(resultCollectorGreedySol100)
+maxSolution = max(resultCollectorGreedySol100)
+
+print "The approximate range of solution for distance with the greedy algorithm for 100 colours is between ", minSolution ," and ",maxSolution
+
+#Greedy algotrithm starting with random colour for 500
+print "------ Greedy algorithm for 500 -----"
+firstRandomColor = random.randint(0,test_size500)
+start = time.time()
+greedyColoursList, sumOfGreedySol = constructive(test_colours500,firstRandomColor)
+end = time.time()
+print "The time of execution for the greedy algotrithm with 500 colours is: ", end-start, ". The sum of the distances is: ", sumOfGreedySol
+#plot_colours(test_colours500, greedyColoursList)
+
+resultCollectorGreedySol500 = []
+
+while(len(resultCollectorGreedySol500)<100):
+    firstRandomColor = random.randint(0,test_size500)
+    greedyColoursList, sumOfGreedySol = constructive(test_colours500,firstRandomColor)
+    resultCollectorGreedySol500.append(sumOfGreedySol)
+
+print resultCollectorGreedySol500
+minSolution = min(resultCollectorGreedySol500)
+maxSolution = max(resultCollectorGreedySol500)
+
+print "The approximate range of solution for distance with the greedy algorithm for 500 colours is between ", minSolution ," and ",maxSolution
+
+
 #permutationColours = listOfIndexesIntoColours(greedyColoursList)
 
 #b = equal_ignore_order(test_colours, permutationColours)
@@ -196,17 +237,20 @@ print "the greedy time is: ", end-start
 hillclimbingIterations = 200
 multiHCIterations = 20
 
+#start = time.time()
 #hillclimbingIndexes, sumofHillclimbingSol = hill_climbing(test_colours, hillclimbingIterations)
+#end = time.time()
+#print "the time of execution for the hill-climbing with 200 iterations is: ", end - start
 #print " the sum in hill_climbing is : ", sumofHillclimbingSol
 #plot_colours(test_colours, hillclimbingIndexes)
 
 
 
 #return values, bestSolIndexes, bestSolEval
-start = time.time()
-v, b, s = multi_hc(multiHCIterations)
-end = time.time()
-print "the time of the multi_hc is: ", end - start
+#start = time.time()
+#v, b, s = multi_hc(multiHCIterations)
+#end = time.time()
+#print "the time of the multi_hc is: ", end - start
 #print "list of values", v
 #print "best value", s
 #plot_colours(test_colours, b)
