@@ -54,7 +54,6 @@ def constructive(setOfColours,randomColour):
     del colours_copy[n]
 
     while(len(constructive_order)<len(setOfColours)):
-#        print "n e ", n
         for p in range(len(colours_copy)):
             #print "setOfColours color", setOfColours[n]
             #print "colours_copy color ", colours_copy[p]
@@ -88,9 +87,15 @@ def listOfIndexesIntoColours(listOfIndexes):
 
 def swap_random(seq):
          idx = range(len(seq))
-        # print "lengtha e tolkoz", len(seq)
          i1, i2 = random.sample(idx, 2)
          seq[i1], seq[i2] = seq[i2], seq[i1]
+
+
+def inversion(listToSwap):
+    idxStart = random.randint(0,(len(listToSwap)/2))
+    idxEnd = random.randint(len(listToSwap)/2, len(listToSwap)-1)
+    listToSwap[idxStart], listToSwap[idxEnd] = listToSwap[idxEnd], listToSwap[idxStart]
+
 
 
 def evaluate(sol):
@@ -106,13 +111,17 @@ def hill_climbing(setOfColours, numberOfIterations):
     #shuffling the list of colours so that i can have a random start
     sol = random.sample(setOfColours, len(setOfColours)) # list of colours for testing
     bestSolList = deepcopy(sol)
+    #list that will save all improvements from the eval_neighbour_sol to be then used for graph
+    solListEval = []
     solListIndexes = []
     eval_sol = evaluate(sol)
+    solListEval.append(eval_sol)
     while (numberOfIterations>0):
         #This function swaps two of the indexes does not return anything, as the change is done to the list itself
-        swap_random(sol)
+        inversion(sol)
         eval_neighbour_sol = evaluate(sol)
         if (eval_neighbour_sol < eval_sol):
+            solListEval.append(eval_neighbour_sol)
             #print "eval_neighbour_sol e ", eval_neighbour_sol
             bestSolList = deepcopy(sol)
             eval_sol = eval_neighbour_sol
@@ -123,44 +132,41 @@ def hill_climbing(setOfColours, numberOfIterations):
         solListIndexes.append(colours.index(bestSolList[i]))
     #print " tui to " ,solListIndexes
 
-    return solListIndexes, eval_sol
+    return solListIndexes, eval_sol, solListEval
 
 
 
-
-#to see if two lists are with the same color
-def equal_ignore_order(a, b):
-    unmatched = list(b)
-    for element in a:
-        try:
-            unmatched.remove(element)
-        except ValueError:
-            return False
-    return not unmatched
-
-
-def multi_hc(tries):
+def multi_hc(tries, setOfColours,hillclimbingIterations):
     bestSolIndexes = []
     bestSolEval = 0
+
+    worstSolIndexes =[]
+    worstSolEval = 0
 
     values = []
 
     for i in range(0, tries):
-        solIndexes,solSum = hill_climbing(test_colours,hillclimbingIterations)
+        solIndexes,solSum, val = hill_climbing(setOfColours,hillclimbingIterations)
 
-        values.append(solSum)
+        #values.append(solSum)
 
         if len(bestSolIndexes) < 1:
             bestSolIndexes = solIndexes[:]
             bestSolEval = solSum
+
+            worstSolIndexes = solIndexes[:]
+            worstSolEval = solSum
             continue;
 
         if (bestSolEval > solSum):
-            bestSolIndexes = solIndexes
+            bestSolIndexes = solIndexes[:]
             bestSolEval = solSum
 
-    return values, bestSolIndexes, bestSolEval
+        if (worstSolEval < solSum):
+            worstSolIndexes = solIndexes[:]
+            worstSolEval = solSum
 
+    return bestSolIndexes, bestSolEval, worstSolIndexes, worstSolEval
 
 #####_______main_____######
 
@@ -182,6 +188,7 @@ test_colours500 = colours[0:test_size500]  # list of colours for testing
 
 
 #Greedy algorithm starting with random colour for 100
+'''
 print "------ Greedy algorithm for 100 -----"
 firstRandomColor = random.randint(0,test_size)
 start = time.time()
@@ -189,8 +196,10 @@ greedyColoursList, sumOfGreedySol = constructive(test_colours,firstRandomColor)
 end = time.time()
 print "The time of execution for the greedy algotrithm with 100 colours is: ", end-start, ". The sum of the distances is: ", sumOfGreedySol
 #plot_colours(test_colours, greedyColoursList)
+'''
 
-#this is to get the range for the sum of distance of Greedy algorithm solution
+#this is to get the range for the sum of distance of Greedy algorithm solution for 100 colours
+'''
 resultCollectorGreedySol100 = []
 
 while(len(resultCollectorGreedySol100)<100):
@@ -202,8 +211,10 @@ minSolution = min(resultCollectorGreedySol100)
 maxSolution = max(resultCollectorGreedySol100)
 
 print "The approximate range of solution for distance with the greedy algorithm for 100 colours is between ", minSolution ," and ",maxSolution
+'''
 
 #Greedy algotrithm starting with random colour for 500
+'''
 print "------ Greedy algorithm for 500 -----"
 firstRandomColor = random.randint(0,test_size500)
 start = time.time()
@@ -211,7 +222,10 @@ greedyColoursList, sumOfGreedySol = constructive(test_colours500,firstRandomColo
 end = time.time()
 print "The time of execution for the greedy algotrithm with 500 colours is: ", end-start, ". The sum of the distances is: ", sumOfGreedySol
 #plot_colours(test_colours500, greedyColoursList)
+'''
 
+#this is to get the range for the sum of distance of Greedy algorithm solution for 500 colours
+'''
 resultCollectorGreedySol500 = []
 
 while(len(resultCollectorGreedySol500)<100):
@@ -224,33 +238,74 @@ minSolution = min(resultCollectorGreedySol500)
 maxSolution = max(resultCollectorGreedySol500)
 
 print "The approximate range of solution for distance with the greedy algorithm for 500 colours is between ", minSolution ," and ",maxSolution
-
-
-#permutationColours = listOfIndexesIntoColours(greedyColoursList)
-
-#b = equal_ignore_order(test_colours, permutationColours)
-#print b
-#greedyColoursList, sumOfGreedySol = constructive(permutationColours,firstRandomColor)
-#print "the sum of the distances in greedy permutation is: ", sumOfGreedySol
-#plot_colours(test_colours,greedyColoursList)
+'''
 
 hillclimbingIterations = 200
 multiHCIterations = 20
 
-#start = time.time()
-#hillclimbingIndexes, sumofHillclimbingSol = hill_climbing(test_colours, hillclimbingIterations)
-#end = time.time()
-#print "the time of execution for the hill-climbing with 200 iterations is: ", end - start
-#print " the sum in hill_climbing is : ", sumofHillclimbingSol
-#plot_colours(test_colours, hillclimbingIndexes)
+#Starting with 100
+start = time.time()
+hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours, hillclimbingIterations)
+end = time.time()
+print "The time of execution for the hill-climbing with 200 iterations for 100 sample list is: ", end - start
+print "The sum of distances for hill_climbing is: ", sumofHillclimbingSol
+plot_colours(test_colours, hillclimbingIndexes)
+
+#populating a list from 1 until the the lenght of valuesHillClimb
+improvements = []
+for iter in range(len(valuesHillClimb)):
+    improvements.append(iter)
+
+plt.figure()
+plt.plot(improvements,valuesHillClimb)
+plt.ylabel('values')
+plt.xlabel('number of times improved')
+plt.title("Improvements in Hill Climbing algotrithm for 100")
+plt.show()
+
+#starting with 500
+start = time.time()
+hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours500, hillclimbingIterations)
+end = time.time()
+print "The time of execution for the hill-climbing with 200 iterations for 500 sample list is: ", end - start
+print "The sum of distances for hill_climbing is: ", sumofHillclimbingSol
+plot_colours(test_colours500, hillclimbingIndexes)
+
+#populating a list from 1 until the the lenght of valuesHillClimb
+improvements = []
+for iter in range(len(valuesHillClimb)):
+    improvements.append(iter)
 
 
+plt.figure()
+plt.plot(improvements,valuesHillClimb)
+plt.ylabel('values')
+plt.xlabel('number of times improved')
+plt.title("Improvements in Hill Climbing algotrithm for 500")
+plt.show()
 
-#return values, bestSolIndexes, bestSolEval
-#start = time.time()
-#v, b, s = multi_hc(multiHCIterations)
-#end = time.time()
-#print "the time of the multi_hc is: ", end - start
-#print "list of values", v
-#print "best value", s
-#plot_colours(test_colours, b)
+'''
+#return values bestSolIndexes, bestSolEval,  (worstSolIndexes, worstSolEval, are only for the range of solutions)
+#starting with 100
+start = time.time()
+bestSolIndexes, bestSolEval, worstSolIndexes,worstSolEval = multi_hc(multiHCIterations, test_colours, hillclimbingIterations)
+end = time.time()
+
+print "The time of the multi_hc is: ", end - start
+print "The best solution's sum of distances: ", bestSolEval
+print "The worst solution is: ", worstSolEval
+#print "list of values", bestSolIndexes
+#print "list of worst values", worstSolIndexes
+#plot_colours(test_colours, bestSolIndexes)
+
+#starting with 500
+
+start = time.time()
+bestSolIndexes, bestSolEval, worstSolIndexes, worstSolEval = multi_hc(multiHCIterations, test_colours500, hillclimbingIterations)
+end = time.time()
+print "The time of the multi_hc is: ", end - start
+print "The best solution's sum of distances: ", bestSolEval
+print "The worst solution is: ", worstSolEval
+#print "list of values", bestSolIndexes
+#plot_colours(test_colours500, bestSolIndexes)
+'''
