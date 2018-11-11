@@ -92,52 +92,62 @@ def swap_random(seq):
          seq[i1], seq[i2] = seq[i2], seq[i1]
 
 
-def inversion(listToSwap):
-    idxStart = random.randint(0,(len(listToSwap)/2))
-    idxEnd = random.randint(len(listToSwap)/2, len(listToSwap)-1)
-    listToSwap[idxStart], listToSwap[idxEnd] = listToSwap[idxEnd], listToSwap[idxStart]
+def inversion(listToSwap, first, second):
+
+    #listToSwap[idxStart], listToSwap[idxEnd] = listToSwap[idxEnd], listToSwap[idxStart]
+    newList = listToSwap[first : second]
+    newList.reverse()
+
+    return newList
 
 
 
 def evaluate(sol):
     total = 0
     for i in range(len(sol)-1):
-        result = sqrt((float(sol[i][0]) - float(sol[i+1][0]))**2 + (float(sol[i][1]) - float(sol[i+1][1]))**2 + (float(sol[i][2]) - float(sol[i+1][2]))**2)
+        #it takes the real values of the list
+        first, second = test_colours[sol[i]], test_colours[sol[i + 1]]
+        result = sqrt((float(first[0]) - float(second[0]))**2 + (float(first[1]) - float(second[1]))**2 + (float(first[2]) - float(second[2]))**2)
         total += result
 
     return total
 
 
+def random_neighbour(s):
+        neighbour = deepcopy(s)
+        list = [0,0]
+        list[0] = random.randint(0,len(neighbour)-1)
+        list[1] = random.randint(0,len(neighbour)-1)
+        #this is to make sure that the first is going to be bigger then the second index
+        list.sort()
+        neighbour[list[0] : list[1] + 1] = inversion(neighbour, list[0], list[1] + 1)
+
+        return neighbour
+
 def hill_climbing(setOfColours, numberOfIterations):
     #shuffling the list of colours so that i can have a random start
-    sol = random.sample(setOfColours, len(setOfColours)) # list of colours for testing
-    bestSolList = deepcopy(sol)
+    sol = random.sample(range(len(setOfColours)), len(setOfColours)) # list of colours for testing
     #list that will save all improvements from the eval_neighbour_sol to be then used for graph
     solListEval = []
-    solListIndexes = []
     eval_sol = evaluate(sol)
     solListEval.append(eval_sol)
     while (numberOfIterations>0):
-        #This function swaps two of the indexes does not return anything, as the change is done to the list itself
-        inversion(sol)
-        eval_neighbour_sol = evaluate(sol)
+        neighbour_sol = random_neighbour(sol)
+        eval_neighbour_sol = evaluate(neighbour_sol)
         if (eval_neighbour_sol < eval_sol):
-            solListEval.append(eval_neighbour_sol)
             #print "eval_neighbour_sol e ", eval_neighbour_sol
-            bestSolList = deepcopy(sol)
+            sol = deepcopy(neighbour_sol)
             eval_sol = eval_neighbour_sol
 
         numberOfIterations -=1
+        solListEval.append(eval_sol)
 
-    for i in range(len(bestSolList)):
-        solListIndexes.append(colours.index(bestSolList[i]))
-    #print " tui to " ,solListIndexes
-
-    return solListIndexes, eval_sol, solListEval
+    return sol, eval_sol, solListEval
 
 
 
 def multi_hc(tries, setOfColours,hillclimbingIterations):
+
     bestSolIndexes = []
     bestSolEval = 0
 
@@ -173,54 +183,36 @@ def multi_hc(tries, setOfColours,hillclimbingIterations):
 
 def annealing(setOfColours,temperature,numberOfIterations):
     #shuffling the list of colours so that i can have a random start
-    sol = random.sample(setOfColours, len(setOfColours)) # list of colours for testing
-    bestSolList = deepcopy(sol)
-    #list that will save all improvements from the eval_neighbour_sol to be then used for graph
+    sol = random.sample(range(len(setOfColours)), len(setOfColours)) # list of colours for testing
+
     solListEval = []
     solListIndices = []
     eval_sol = evaluate(sol)
-    tempmin = 10
-    temperature
-    solListEval.append(eval_sol) #and ((tempmin) < temperature)
-    while ((numberOfIterations>0)):
-        #This function swaps two of the indexes does not return anything, as the change is done to the list itself
-        neighbour_sol = random.sample(setOfColours, len(setOfColours))
-        eval_neighbour_sol = evaluate(neighbour_sol)
-        deltaEval = (eval_neighbour_sol - eval_sol)
-        print "tva e deltaEval", deltaEval
-        if (deltaEval < 0):
-            solListEval.append(eval_neighbour_sol)
-            #print "eval_neighbour_sol e ", eval_neighbour_sol
-            bestSolList = deepcopy(sol)
-            eval_sol = eval_neighbour_sol
-            temperature = temperature-10
-        elif(deltaEval>0):
-            if((1 - math.exp(-deltaEval/temperature)) > random.uniform(0,1)):
-                print"math.exp(deltaEval/temperature) > random.uniform(0,1)", math.exp(-deltaEval/temperature)
-                print " random", random.uniform(0,1)
+
+    tempmin = 0.00001
+    alpha = 0.7
+    solListEval.append(eval_sol)
+
+    while (tempmin < temperature):
+        for i in range(numberOfIterations):
+            eval_neighbour_sol = evaluate(sol)
+            deltaEval = (eval_neighbour_sol - eval_sol)
+            if (eval_neighbour_sol < eval_sol):
                 solListEval.append(eval_neighbour_sol)
                 #print "eval_neighbour_sol e ", eval_neighbour_sol
                 bestSolList = deepcopy(sol)
                 eval_sol = eval_neighbour_sol
-                temperature = temperature-20
-
-        numberOfIterations -=1
-
-    for i in range(len(bestSolList)):
-        solListIndices.append(colours.index(bestSolList[i]))
-    #print " tui to " ,solListIndices
-
-
-    return solListIndices, eval_sol, solListEval
+            else:
+                if((1 - math.exp(-deltaEval/temperature)) > random.uniform(0,1)):
+                    solListEval.append(eval_neighbour_sol)
+                    #print "eval_neighbour_sol e ", eval_neighbour_sol
+                    bestSolList = deepcopy(sol)
+                    eval_sol = eval_neighbour_sol
+        temperature = temperature * alpha
 
 
 
-    #for temp = tmax to tmin
-    #evaluate the first solutions
-    #take a new solution
-    #evaluate the new solutions
-    # if the difference between (new - first)< 0 take the new solution and decrease the temp
-    # if (new - first ) > then if (e^(difference/temp)> rand(0,1) ) then take the new solution
+    return bestSolList, eval_sol, solListEval
 
 
 #####_______main_____######
@@ -295,9 +287,9 @@ maxSolution = max(resultCollectorGreedySol500)
 print "The approximate range of solution for distance with the greedy algorithm for 500 colours is between ", minSolution ," and ",maxSolution
 '''
 
-hillclimbingIterations = 20000
+hillclimbingIterations = 10000
 multiHCIterations = 20
-'''
+
 #Starting with 100
 start = time.time()
 hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours, hillclimbingIterations)
@@ -317,7 +309,7 @@ plt.ylabel('values')
 plt.xlabel('number of times improved')
 plt.title("Improvements in Hill Climbing algotrithm for 100")
 plt.show()
-
+'''
 #starting with 500
 start = time.time()
 hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours500, hillclimbingIterations)
@@ -364,13 +356,14 @@ print "The worst solution is: ", worstSolEval
 #print "list of values", bestSolIndexes
 #plot_colours(test_colours500, bestSolIndexes)
 '''
-
+'''
 #annealing for 100
-temperatureAnnealing = 10000
+temperatureAnnealing = 1
 start = time.time()
 annealingIndecies, sumOfAnnealingEval, valuesAnnealing = annealing(test_colours,temperatureAnnealing, hillclimbingIterations)
 end = time.time()
 print "The time of execution for the annealing with 200 iterations and temp of 100 for 100 sample list is: ", end - start
-print "The sum of distances for hill_climbing is: ", sumOfAnnealingEval
+print "The sum of distances for simulated_annealing is: ", sumOfAnnealingEval
 #print "Values gathered", valuesAnnealing
 #plot_colours(test_colours, annealingIndecies)
+'''
