@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import random
+import numpy as np
 import os
 import time
+import math
 
 from math import sqrt
 from random import shuffle
@@ -168,6 +169,60 @@ def multi_hc(tries, setOfColours,hillclimbingIterations):
 
     return bestSolIndexes, bestSolEval, worstSolIndexes, worstSolEval
 
+
+
+def annealing(setOfColours,temperature,numberOfIterations):
+    #shuffling the list of colours so that i can have a random start
+    sol = random.sample(setOfColours, len(setOfColours)) # list of colours for testing
+    bestSolList = deepcopy(sol)
+    #list that will save all improvements from the eval_neighbour_sol to be then used for graph
+    solListEval = []
+    solListIndices = []
+    eval_sol = evaluate(sol)
+    tempmin = 10
+    temperature
+    solListEval.append(eval_sol) #and ((tempmin) < temperature)
+    while ((numberOfIterations>0)):
+        #This function swaps two of the indexes does not return anything, as the change is done to the list itself
+        neighbour_sol = random.sample(setOfColours, len(setOfColours))
+        eval_neighbour_sol = evaluate(neighbour_sol)
+        deltaEval = (eval_neighbour_sol - eval_sol)
+        print "tva e deltaEval", deltaEval
+        if (deltaEval < 0):
+            solListEval.append(eval_neighbour_sol)
+            #print "eval_neighbour_sol e ", eval_neighbour_sol
+            bestSolList = deepcopy(sol)
+            eval_sol = eval_neighbour_sol
+            temperature = temperature-10
+        elif(deltaEval>0):
+            if((1 - math.exp(-deltaEval/temperature)) > random.uniform(0,1)):
+                print"math.exp(deltaEval/temperature) > random.uniform(0,1)", math.exp(-deltaEval/temperature)
+                print " random", random.uniform(0,1)
+                solListEval.append(eval_neighbour_sol)
+                #print "eval_neighbour_sol e ", eval_neighbour_sol
+                bestSolList = deepcopy(sol)
+                eval_sol = eval_neighbour_sol
+                temperature = temperature-20
+
+        numberOfIterations -=1
+
+    for i in range(len(bestSolList)):
+        solListIndices.append(colours.index(bestSolList[i]))
+    #print " tui to " ,solListIndices
+
+
+    return solListIndices, eval_sol, solListEval
+
+
+
+    #for temp = tmax to tmin
+    #evaluate the first solutions
+    #take a new solution
+    #evaluate the new solutions
+    # if the difference between (new - first)< 0 take the new solution and decrease the temp
+    # if (new - first ) > then if (e^(difference/temp)> rand(0,1) ) then take the new solution
+
+
 #####_______main_____######
 
 # Get the directory where the file is located
@@ -240,9 +295,9 @@ maxSolution = max(resultCollectorGreedySol500)
 print "The approximate range of solution for distance with the greedy algorithm for 500 colours is between ", minSolution ," and ",maxSolution
 '''
 
-hillclimbingIterations = 200
+hillclimbingIterations = 20000
 multiHCIterations = 20
-
+'''
 #Starting with 100
 start = time.time()
 hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours, hillclimbingIterations)
@@ -283,7 +338,7 @@ plt.ylabel('values')
 plt.xlabel('number of times improved')
 plt.title("Improvements in Hill Climbing algotrithm for 500")
 plt.show()
-
+'''
 '''
 #return values bestSolIndexes, bestSolEval,  (worstSolIndexes, worstSolEval, are only for the range of solutions)
 #starting with 100
@@ -309,3 +364,13 @@ print "The worst solution is: ", worstSolEval
 #print "list of values", bestSolIndexes
 #plot_colours(test_colours500, bestSolIndexes)
 '''
+
+#annealing for 100
+temperatureAnnealing = 10000
+start = time.time()
+annealingIndecies, sumOfAnnealingEval, valuesAnnealing = annealing(test_colours,temperatureAnnealing, hillclimbingIterations)
+end = time.time()
+print "The time of execution for the annealing with 200 iterations and temp of 100 for 100 sample list is: ", end - start
+print "The sum of distances for hill_climbing is: ", sumOfAnnealingEval
+#print "Values gathered", valuesAnnealing
+#plot_colours(test_colours, annealingIndecies)
