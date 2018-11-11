@@ -184,35 +184,33 @@ def multi_hc(tries, setOfColours,hillclimbingIterations):
 def annealing(setOfColours,temperature,numberOfIterations):
     #shuffling the list of colours so that i can have a random start
     sol = random.sample(range(len(setOfColours)), len(setOfColours)) # list of colours for testing
-
     solListEval = []
-    solListIndices = []
-    eval_sol = evaluate(sol)
 
     tempmin = 0.00001
-    alpha = 0.7
+    alpha = 0.5
+
+    eval_sol = evaluate(sol)
     solListEval.append(eval_sol)
 
     while (tempmin < temperature):
         for i in range(numberOfIterations):
-            eval_neighbour_sol = evaluate(sol)
+            neighbour_sol = random_neighbour(sol)
+            eval_neighbour_sol = evaluate(neighbour_sol)
+
             deltaEval = (eval_neighbour_sol - eval_sol)
+
             if (eval_neighbour_sol < eval_sol):
-                solListEval.append(eval_neighbour_sol)
-                #print "eval_neighbour_sol e ", eval_neighbour_sol
-                bestSolList = deepcopy(sol)
+                sol = deepcopy(neighbour_sol)
                 eval_sol = eval_neighbour_sol
             else:
                 if((1 - math.exp(-deltaEval/temperature)) > random.uniform(0,1)):
-                    solListEval.append(eval_neighbour_sol)
-                    #print "eval_neighbour_sol e ", eval_neighbour_sol
-                    bestSolList = deepcopy(sol)
+                    sol = deepcopy(neighbour_sol)
                     eval_sol = eval_neighbour_sol
+
+            solListEval.append(eval_sol)
         temperature = temperature * alpha
 
-
-
-    return bestSolList, eval_sol, solListEval
+    return sol, eval_sol, solListEval
 
 
 #####_______main_____######
@@ -287,9 +285,9 @@ maxSolution = max(resultCollectorGreedySol500)
 print "The approximate range of solution for distance with the greedy algorithm for 500 colours is between ", minSolution ," and ",maxSolution
 '''
 
-hillclimbingIterations = 10000
+hillclimbingIterations = 650
 multiHCIterations = 20
-
+'''
 #Starting with 100
 start = time.time()
 hillclimbingIndexes, sumofHillclimbingSol, valuesHillClimb = hill_climbing(test_colours, hillclimbingIterations)
@@ -309,6 +307,7 @@ plt.ylabel('values')
 plt.xlabel('number of times improved')
 plt.title("Improvements in Hill Climbing algotrithm for 100")
 plt.show()
+'''
 '''
 #starting with 500
 start = time.time()
@@ -356,14 +355,13 @@ print "The worst solution is: ", worstSolEval
 #print "list of values", bestSolIndexes
 #plot_colours(test_colours500, bestSolIndexes)
 '''
-'''
+
 #annealing for 100
-temperatureAnnealing = 1
+temperatureAnnealing = 3
 start = time.time()
 annealingIndecies, sumOfAnnealingEval, valuesAnnealing = annealing(test_colours,temperatureAnnealing, hillclimbingIterations)
 end = time.time()
 print "The time of execution for the annealing with 200 iterations and temp of 100 for 100 sample list is: ", end - start
 print "The sum of distances for simulated_annealing is: ", sumOfAnnealingEval
-#print "Values gathered", valuesAnnealing
-#plot_colours(test_colours, annealingIndecies)
-'''
+print "Values gathered", valuesAnnealing
+plot_colours(test_colours, annealingIndecies)
