@@ -304,7 +304,6 @@ plt.xlabel('number of times iterated')
 plt.title("Improvements in Hill Climbing algotrithm")
 plt.show()
 
-'''
 ##### Multi Hill Climbing #####
 print "------ Multi Hill Climbing algorithm for ", multiIterations ," times with Hill Climbing at ",hillclimbingIterations," iterations -----"
 start = time.time()
@@ -335,11 +334,12 @@ print "The time of execution for the annealing with ",simulatedAnnealingIteratio
 print "The sum of distances for simulated_annealing is: ", sumOfAnnealingEval
 plot_colours(test_colours, annealingIndecies)
 
+### Multi SA ###
 print "------ Multi Simulated Annealing algorithm for ", multiIterations ," times with SA at ",simulatedAnnealingIterations," iterations -----"
 start = time.time()
 bestSolIndecies, bestSolEval, valuesMulti = multi_sa(multiIterations, test_colours,temperatureAnnealing, simulatedAnnealingIterations)
 end = time.time()
-print "The time of the multi_hc is: ", end - start
+print "The time of the multi_sa is: ", end - start
 print "The best solution's sum of distances: ", bestSolEval
 print "The Standard Deviation is: ", np.std(valuesMulti)
 print "The mean is: ", np.mean(valuesMulti)
@@ -349,4 +349,3 @@ fig4, ax4 = plt.subplots()
 ax4.set_title('Multi Simulated annealing boxplot')
 ax4.boxplot(valuesMulti, showfliers=False)
 plt.show()
-'''

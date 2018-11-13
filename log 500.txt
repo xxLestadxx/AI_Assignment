@@ -1,0 +1,22 @@
+------ Greedy algorithm for  500  sample-----
+The time of execution for the greedy algotrithm with  500  colours is:  0.925578117371 . The sum of the distances is:  53.5200316987
+------ Hill Climbing algorithm for  500  sample-----
+The time of execution for the hill-climbing with 3000 iterations for  500  sample list is:  5.7351911068
+The sum of distances for hill_climbing is:  181.352257955
+
+------ Multi Hill Climbing algorithm for  30  times with Hill Climbing at  3000  iterations -----
+The time of the multi_hc is:  175.201146126
+The best solution's sum of distances:  175.980308144
+The Standard Diviation is:  2.68333801624
+The mean is:  182.178546666
+The median is:  182.734351267
+------ Simulated Annealing algorithm for  500  sample-----
+The time of execution for the annealing with  400  iterations and temperature of  3  for  500  sample list is:  15.0560221672
+The sum of distances for simulated_annealing is:  146.035263202
+------ Multi Simulated Annealing algorithm for  30  times with SA at  400  iterations -----
+The time of the multi_hc is:  474.073254108
+The best solution's sum of distances:  141.856102488
+The Standard Diviation is:  2.75148530691
+The mean is:  147.325291537
+The median is:  147.412109405
+
